@@ -182,6 +182,7 @@ class DevialetApi:
         for source in self._sources["sources"]:
             source_type = source["type"]
             device_id = source["deviceId"]
+            source_id = source["sourceId"]
 
             if source_type == "optical":
                 position = ""
@@ -195,7 +196,11 @@ class DevialetApi:
 
             for pretty_name, name in NORMAL_INPUTS.items():
                 if name == source_type:
-                    self._source_list[pretty_name] = name
+                    i = 1
+                    while pretty_name in self._source_list:
+                        pretty_name = f"{pretty_name} ({i})"
+                        i=i+1
+                    self._source_list[pretty_name] = source_id
 
         return sorted(self._source_list)
 
