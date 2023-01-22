@@ -271,20 +271,18 @@ class DevialetApi:
     def source(self):
         """Return the current input source."""
         try:
-            source_type = self._source_state["source"]["type"]
-            device_id = self._source_state["source"]["deviceId"]
+            fetched_source_id = self._source_state["source"]["sourceId"]
         except (KeyError, TypeError):
             return None
 
-        position = ""
-        if source_type == "optical" and self.device_role in SPEAKER_POSITIONS:
-            for role, position in SPEAKER_POSITIONS.items():
-                if (device_id == self.device_id and role == self.device_role) or (
-                    device_id != self.device_id and role != self.device_role
-                ):
-                    source_type = source_type + "_" + position
+        if len(self._source_list) == 0:
+            self.source_list
 
-        return source_type
+        for pretty_name in self._source_list:
+            if self._source_list[pretty_name] == fetched_source_id:
+                return pretty_name
+
+        raise Exception(f"Unknown source {fetched_source_id}")
 
     @property
     def night_mode(self):
@@ -397,7 +395,13 @@ class DevialetApi:
 
     async def async_select_source(self, source: str) -> None:
         """Select input source."""
-        # Not available yet
+        if len(self._source_list) == 0:
+            self.source_list
+
+        if source not in self._source_list:
+            raise Exception(f"Unknown source {source}")
+
+        await self.post_request(f"/ipcontrol/v1/groups/current/sources/{self._source_list[source]}/playback/play", {})
 
     async def get_request(self, suffix=str):
         """Generic GET method."""
