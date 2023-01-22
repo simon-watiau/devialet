@@ -397,7 +397,13 @@ class DevialetApi:
 
     async def async_select_source(self, source: str) -> None:
         """Select input source."""
-        # Not available yet
+        if len(self._source_list) == 0:
+            self.source_list
+
+        if source not in self._source_list:
+            raise Exception(f"Unknown source {source}")
+
+        await self.post_request(f"/ipcontrol/v1/groups/current/sources/{self._source_list[source]}/playback/play", {})
 
     async def get_request(self, suffix=str):
         """Generic GET method."""
