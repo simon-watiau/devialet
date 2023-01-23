@@ -179,7 +179,7 @@ class DevialetApi:
         if self._sources is None or len(self._source_list) > 0:
             return sorted(self._source_list)
 
-        for source in self._sources["sources"]:
+        for source in sorted(self._sources["sources"], key=lambda source: source["deviceId"]):
             source_type = source["type"]
             device_id = source["deviceId"]
             source_id = source["sourceId"]
